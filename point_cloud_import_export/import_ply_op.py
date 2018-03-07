@@ -54,7 +54,7 @@ def add_empty(empty_name):
     bpy.context.scene.objects.link(empty_obj)
     return empty_obj
 
-def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_extent):
+def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_extent, default_point_color):
     print("Adding Points: ...")
     stop_watch = StopWatch()
     name = "Point_Cloud"
@@ -93,6 +93,7 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
                 material = bpy.data.materials.get(material_name)
                 if material is None:
                     material = bpy.data.materials.new(name=material_name)
+                material.diffuse_color = (default_point_color[0] / 255.0, default_point_color[1] / 255.0, default_point_color[2] / 255.0) 
                 viz_mesh.data.materials.append(material)
                 
                 # enable cycles, otherwise the material has no nodes
@@ -184,6 +185,7 @@ from bpy.props import (CollectionProperty,
                        EnumProperty,
                        FloatProperty,
                        IntProperty,
+                       IntVectorProperty
                        )
 
 from bpy_extras.io_utils import (ImportHelper,
@@ -220,6 +222,13 @@ class ImportPLY(bpy.types.Operator, ImportHelper):
         name="Mesh Type",
         description = "Select the vertex representation mesh type.", 
         items=mesh_items)
+    default_point_color = IntVectorProperty(
+        name="Default Color", 
+        description = "Color",
+        default=(255,255,255),
+        min=0,
+        max=255)
+
     point_extent = FloatProperty(
         name="Initial Point Extent (in Blender Units)", 
         description = "Initial Point Extent for meshes at vertex positions",
@@ -242,6 +251,6 @@ class ImportPLY(bpy.types.Operator, ImportHelper):
 
             print("Number points: " + str(len(points)))
             if self.import_points:
-                add_points_as_mesh(points, self.add_points_as_particle_system, self.mesh_type, self.point_extent)
+                add_points_as_mesh(points, self.add_points_as_particle_system, self.mesh_type, self.point_extent, self.default_point_color)
 
         return {'FINISHED'}

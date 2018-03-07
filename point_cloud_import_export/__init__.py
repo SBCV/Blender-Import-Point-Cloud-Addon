@@ -19,8 +19,8 @@ Created by Sebastian Bullinger
 '''
 
 bl_info = {
-    "name": "Point Cloud Import Export Addon",
-    "description": "Allows to import and export point clouds.",
+    "name": "Point Cloud Import Addon (PLY)",
+    "description": "Allows to import point clouds (.ply).",
     "author": "Sebastian Bullinger",
     "version": (1, 0, 0),
     "blender": (2, 79, 0),
