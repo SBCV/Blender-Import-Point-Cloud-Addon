@@ -81,9 +81,9 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
         elif mesh_type == "CUBE":
             bpy.ops.mesh.primitive_cube_add(radius=point_scale)
         elif mesh_type == "SPHERE":
-            bpy.ops.mesh.primitive_uv_sphere_add(radius=point_scale)
+            bpy.ops.mesh.primitive_uv_sphere_add(size=point_scale)
         else:
-            bpy.ops.mesh.primitive_uv_sphere_add(radius=point_scale)
+            bpy.ops.mesh.primitive_uv_sphere_add(size=point_scale)
         viz_mesh = bpy.context.object
 
         if add_points_as_particle_system:
