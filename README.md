@@ -3,6 +3,7 @@ Blender addon to import point clouds from PLY files.
 
 Tested for Blender 2.78 and 2.79 as well as Ubuntu 14.04 and Windows 10.
 
+This addon uses the https://github.com/dranjan/python-plyfile library to parse plyfiles.
 
 Import
 =====
