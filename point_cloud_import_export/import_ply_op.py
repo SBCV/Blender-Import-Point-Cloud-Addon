@@ -54,7 +54,7 @@ def add_empty(empty_name):
     bpy.context.scene.objects.link(empty_obj)
     return empty_obj
 
-def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_extent, default_point_color):
+def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_extent, default_point_color, use_default_color_for_rendering):
     print("Adding Points: ...")
     stop_watch = StopWatch()
     name = "Point_Cloud"
@@ -90,7 +90,9 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
             
             material_name = "PointCloudMaterial"
             material = bpy.data.materials.new(name=material_name)
-            material.diffuse_color = (default_point_color[0] / 255.0, default_point_color[1] / 255.0, default_point_color[2] / 255.0) 
+            material.diffuse_color = (default_point_color[0] / 255.0, 
+                                      default_point_color[1] / 255.0, 
+                                      default_point_color[2] / 255.0) 
             viz_mesh.data.materials.append(material)
             
             # enable cycles, otherwise the material has no nodes
@@ -131,7 +133,10 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
                 for point_index, point in enumerate(points):
                     column_offset = point_index * 4     # (R,G,B,A)
                     row_offset = j * 4 * num_points
-                    color = point.color 
+                    if use_default_color_for_rendering:
+                        color = default_point_color
+                    else:
+                        color = point.color 
                     # Order is R,G,B, opacity
                     local_pixels[row_offset + column_offset] = color[0] / 255.0
                     local_pixels[row_offset + column_offset + 1] = color[1] / 255.0
@@ -224,6 +229,10 @@ class ImportPLY(bpy.types.Operator, ImportHelper):
         default=(255,255,255),
         min=0,
         max=255)
+    use_default_color_for_rendering = BoolProperty(
+        name="Use Default Color For Rendering",
+        description = "Overwrite the colors in the ply file.", 
+        default=False)
 
     point_extent = FloatProperty(
         name="Initial Point Extent (in Blender Units)", 
@@ -247,6 +256,11 @@ class ImportPLY(bpy.types.Operator, ImportHelper):
 
             print("Number points: " + str(len(points)))
             if self.import_points:
-                add_points_as_mesh(points, self.add_points_as_particle_system, self.mesh_type, self.point_extent, self.default_point_color)
+                add_points_as_mesh(
+                    points, 
+                    self.add_points_as_particle_system, 
+                    self.mesh_type, self.point_extent, 
+                    self.default_point_color,
+                    self.use_default_color_for_rendering)
 
         return {'FINISHED'}
