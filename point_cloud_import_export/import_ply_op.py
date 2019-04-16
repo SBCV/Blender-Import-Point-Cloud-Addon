@@ -31,17 +31,18 @@ from point_cloud_import_export.point import Point
 
 def add_obj(data, obj_name, deselect_others=False):
     scene = bpy.context.scene
+    collection = bpy.context.collection
 
     if deselect_others:
         for obj in scene.objects:
             obj.select = False
 
     new_obj = bpy.data.objects.new(obj_name, data)
-    scene.objects.link(new_obj)
-    new_obj.select = True
+    collection.objects.link(new_obj)
+    new_obj.select_set(state=True)
 
-    if scene.objects.active is None or scene.objects.active.mode == 'OBJECT':
-        scene.objects.active = new_obj
+    if bpy.context.view_layer.objects.active is None or bpy.context.view_layer.objects.active.mode == 'OBJECT':
+        bpy.context.view_layer.objects.active = new_obj
     return new_obj
 
 def set_object_parent(child_object_name, parent_object_name, keep_transform=False):
@@ -77,9 +78,9 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
 
         bpy.ops.object.select_all(action='DESELECT')
         if mesh_type == "PLANE":
-            bpy.ops.mesh.primitive_plane_add(radius=point_scale)
+            bpy.ops.mesh.primitive_plane_add(size=point_scale)
         elif mesh_type == "CUBE":
-            bpy.ops.mesh.primitive_cube_add(radius=point_scale)
+            bpy.ops.mesh.primitive_cube_add(size=point_scale)
         elif mesh_type == "SPHERE":
             bpy.ops.mesh.primitive_uv_sphere_add(size=point_scale)
         else:
@@ -92,11 +93,12 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
             material = bpy.data.materials.new(name=material_name)
             material.diffuse_color = (default_point_color[0] / 255.0, 
                                       default_point_color[1] / 255.0, 
-                                      default_point_color[2] / 255.0) 
+                                      default_point_color[2] / 255.0,
+                                      1.0) 
             viz_mesh.data.materials.append(material)
             
             # enable cycles, otherwise the material has no nodes
-            bpy.context.scene.render.engine = 'CYCLES'
+            bpy.context.scene.render.engine = 'CYCLES'      # 'BLENDER_EEVEE'
             material.use_nodes = True
             node_tree = material.node_tree
             if 'Material Output' in node_tree.nodes:
@@ -142,7 +144,7 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
                     local_pixels[row_offset + column_offset + 1] = color[1] / 255.0
                     local_pixels[row_offset + column_offset + 2] = color[2] / 255.0
                     # opacity (0 = transparent, 1 = opaque)
-                    #local_pixels[row_offset + column_offset + 3] = 1.0    # already set by default   
+                    local_pixels[row_offset + column_offset + 3] = 1.0      
                 
             image.pixels = local_pixels[:]  
             
@@ -168,7 +170,7 @@ def add_points_as_mesh(points, add_points_as_particle_system, mesh_type, point_e
             settings.hair_length = 100           # This must not be 0
             settings.use_emit_random = False
             settings.render_type = 'OBJECT'
-            settings.dupli_object = viz_mesh
+            settings.instance_object = viz_mesh
             
         bpy.context.scene.update
     else:

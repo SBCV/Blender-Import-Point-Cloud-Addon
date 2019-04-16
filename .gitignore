@@ -1,1 +1,3 @@
 point_cloud_import_export.zip
+/point_cloud_import_export/__pycache__/*
+/point_cloud_import_export/.vscode/*

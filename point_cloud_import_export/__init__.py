@@ -23,7 +23,7 @@ bl_info = {
     "description": "Allows to import point clouds (.ply).",
     "author": "Sebastian Bullinger",
     "version": (1, 0, 0),
-    "blender": (2, 79, 0),
+    "blender": (2, 80, 0),
     "location": "View3D",
     "warning": "",
     "wiki_url": "",
@@ -48,29 +48,20 @@ from point_cloud_import_export.import_ply_op import ImportPLY
 # register
 ##################################
 
-import traceback
-
 def menu_func_import(self, context):
     self.layout.operator(ImportPLY.bl_idname, text="Point Cloud PLY Import (.ply)")
 
 
 def register():
-    try: bpy.utils.register_module(__name__)
-    except: traceback.print_exc()
-
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
-
-    print("Registered {} with {} modules".format(bl_info["name"], len(modules)))
-    
+    bpy.utils.register_class(ImportPLY)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
+    print("Registered {} with {} modulse".format(bl_info["name"], len(modules)))
 
 def unregister():
-    try: bpy.utils.unregister_module(__name__)
-    except: traceback.print_exc()
-
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
-
+    bpy.utils.unregister_class(ImportPLY)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
     print("Unregistered {}".format(bl_info["name"]))
 
 if __name__ == '__main__':
     print('main called')
-    
+    register()
